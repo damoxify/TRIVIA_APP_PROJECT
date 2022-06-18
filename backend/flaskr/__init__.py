@@ -23,9 +23,29 @@ def create_app(test_config=None):
                              "GET,PUT,POST,DELETE,OPTIONS")
         return response
 
+ # endpoint to handle GET requests for questions
+
+    @app.route("/questions/<int:question_id>", methods=["GET"])
+    def get_question(question_id):
+        questions = Question.query.all()
+        formatted_questions = [Question.format() for question in questions]
+        return jsonify(
+            {
+                "success": True,
+                "questions": formatted_questions[start:end],
+                "total_questions": len(formatted_questions),
+            }
+        )
+
+        # question = Question.query.filter(
+        #     Question.id == question_id).one_or_none()
+        # if question is None:
+        #     abort(404)
+        # else:
+        #     return jsonify({"success": True, "question": question.format()})
+
 
 # endpoint to handle GET requests for questions including pagination
-
 
     @app.route("/questions", methods=["GET"])
     # @cross_origin
@@ -39,26 +59,9 @@ def create_app(test_config=None):
         current_questions = questions[start:end]
         return current_questions
 
-        # questions = Question.query.all()
-        # formatted_questions = [Question.format() for question in questions]
-        # return jsonify(
-        #     {
-        #         "success": True,
-        #         "questions": formatted_questions[start:end],
-        #         "total_questions": len(formatted_questions),
-        #     }
-        # )
-
-    @app.route("/questions/<int:question_id>", methods=["GET"])
-    def get_specific_question(question_id):
-        question = Question.query.filter(
-            Question.id == question_id).one_or_none()
-        if question is None:
-            abort(404)
-        else:
-            return jsonify({"success": True, "question": question.format()})
 
 # endpoint to DELETE question using a question ID.
+
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
         try:
@@ -85,7 +88,6 @@ def create_app(test_config=None):
 
 
 # endpoint to POST a new question
-
 
     @app.route("/question", methods=["POST"])
     def create_question():
@@ -114,7 +116,6 @@ def create_app(test_config=None):
 
 # POST endpoint to get questions to play the quiz.
 
-
     @app.route("/quizzes", methods=["POST"])
     def get_next_question():
         body = request.get_json()
@@ -141,7 +142,6 @@ def create_app(test_config=None):
 
 
 # Error handlers
-
 
     @app.errorhandler(404)
     def not_found(error):
