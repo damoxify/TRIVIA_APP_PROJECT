@@ -52,7 +52,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["message"], "resource not found")
 
     def test_get_question_search_with_results(self):
-        res = self.client().post("/questions", json={"search": "Novel"})
+        res = self.client().post("/questions", json={"search": "Quiz"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -61,7 +61,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data["questions"]), 2)
 
     def test_get_question_search_without_results(self):
-        res = self.client().post("/questions", json={"search": "applejacks"})
+        res = self.client().post("/questions", json={"search": "flyingdog"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
