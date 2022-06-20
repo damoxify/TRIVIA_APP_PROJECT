@@ -32,8 +32,7 @@ def create_app(test_config=None):
         return jsonify(
             {
                 "success": True,
-                "questions": formatted_questions[start:end],
-                "total_questions": len(formatted_questions),
+                "total_questions": len(formatted_questions)
             }
         )
 
@@ -46,6 +45,7 @@ def create_app(test_config=None):
 
 
 # endpoint to handle GET requests for questions including pagination
+
 
     @app.route("/questions", methods=["GET"])
     # @cross_origin
@@ -61,6 +61,7 @@ def create_app(test_config=None):
 
 
 # endpoint to DELETE question using a question ID.
+
 
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
@@ -89,6 +90,7 @@ def create_app(test_config=None):
 
 # endpoint to POST a new question
 
+
     @app.route("/question", methods=["POST"])
     def create_question():
         body = request.get_json()
@@ -116,6 +118,7 @@ def create_app(test_config=None):
 
 # POST endpoint to get questions to play the quiz.
 
+
     @app.route("/quizzes", methods=["POST"])
     def get_next_question():
         body = request.get_json()
@@ -142,6 +145,7 @@ def create_app(test_config=None):
 
 
 # Error handlers
+
 
     @app.errorhandler(404)
     def not_found(error):
