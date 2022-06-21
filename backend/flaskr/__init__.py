@@ -27,7 +27,7 @@ def create_app(test_config=None):
 
  # endpoint to handle GET requests for questions
 
-    @app.route("api/v1/questions", methods=["GET"])
+    @app.route("/api/v1/questions", methods=["GET"])
     def get_question(question_id):
         questions = Question.query.all()
         categories = Category.query.all()
@@ -55,7 +55,7 @@ def create_app(test_config=None):
 
 # endpoint to handle GET requests for questions including pagination
 
-    @app.route("/questions", methods=["GET"])
+    @app.route("/api/v1/questions", methods=["GET"])
     # @cross_origin
     def paginate_questions(request, selection):
         # Implement pagniation
@@ -70,7 +70,7 @@ def create_app(test_config=None):
 
 # endpoint to DELETE question using a question ID.
 
-    @app.route("api/v1/questions/<int:question_id>", methods=["DELETE"])
+    @app.route("/api/v1/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
         try:
             question = Question.query.filter(
@@ -96,7 +96,7 @@ def create_app(test_config=None):
 
 # endpoint to POST a new question
 
-    @app.route("api/v1/questions", methods=["POST"])
+    @app.route("/api/v1/questions", methods=["POST"])
     def create_question():
         body = request.get_json()
         page = request.args.get("page", 1, type=int)
@@ -145,7 +145,7 @@ def create_app(test_config=None):
 
 # POST endpoint to get questions to play the quiz.
 
-    @app.route("api/v1/quizzes", methods=["POST"])
+    @app.route("/api/v1/quizzes", methods=["POST"])
     def get_quizzes():
         try:
             body = request.get_json()
