@@ -222,7 +222,7 @@ def create_app(test_config=None):
                 questions = Question.query.all()
             else:
                 questions = Question.query.filter(
-                    Question.catgory == category["id"]).all()
+                    Question.category == category["id"]).all()
             question_pool = []
 
             for quest in questions:
