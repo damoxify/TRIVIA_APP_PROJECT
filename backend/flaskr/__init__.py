@@ -25,24 +25,65 @@ def create_app(test_config=None):
                              "GET,PUT,POST,DELETE,OPTIONS")
         return response
 
- # endpoint to handle GET requests for questions
 
-    @app.route("/api/v1/questions", methods=["GET"])
-    def get_question(question_id):
-        questions = Question.query.all()
-        categories = Category.query.all()
+#    @TODO:
+#     Create an endpoint to handle GET requests
+#     for all available categories.
+
+
+    def format_categories(categories):
+        result = {}
+        for category in categories:
+            category = category.format()
+            result[category["id"]] = category["type"]
+        return result
+
+    def paginate_questions(request, questions):
+        # Implement pagniation
         page = request.args.get("page", 1, type=int)
-        formatted_categories = formatted_categories(categories)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+
         every_questions = [question.format() for question in questions]
-        current_questions = paginate_questions(request, questions)
-        if(len(current_questions) == 0 and page != 1):
-            abort(404)
+        current_questions = every_questions[start:end]
+        return current_questions
+
+    @app.route("/api/v1/categories", methods=["GET"])
+    def get_all_categories():
+
+        # get all categories from database
+        categories = Category.query.all()
+    # format each category
+        formatted_categories = format_categories(categories)
+
+        # return json response with categories
         return jsonify({
             "success": True,
-            "total_questions": len(every_questions),
-            "questions": current_questions,
-            "categories": formatted_categories,
-            "current_category": None
+            "categories": formatted_categories
+        })
+
+#   @TODO:
+#         Create a GET endpoint to get questions based on category.
+
+    @app.route("/api/v1/categories/<int:category_id>/questions", methods=["GET"])
+    def get_question_by_category(category_id):
+        category = Category.query.get(category_id)
+        page = request.args.get("page", 1, type=int)
+        if category == None:
+            abort(404)
+
+        questions = Question.query.filter(
+            Question.category == category_id).all()
+        formatted_questions = paginate_questions(request, questions)
+
+        if(len(formatted_questions) == 0 and page != 1):
+            abort(404)
+
+        return jsonify({
+            "success": True,
+            "questions": formatted_questions,
+            "total_questions": len(questions),
+            "current_category": category.type
         })
 
         # question = Question.query.filter(
@@ -53,40 +94,53 @@ def create_app(test_config=None):
         #     return jsonify({"success": True, "question": question.format()})
 
 
-# endpoint to handle GET requests for questions including pagination
+#   @TODO:
+#     Create an endpoint to handle GET requests for questions,
+#     including pagination (every 10 questions).
+#     This endpoint should return a list of questions,
+#     number of total questions, current category, categories.
+
 
     @app.route("/api/v1/questions", methods=["GET"])
-    # @cross_origin
-    def paginate_questions(request, selection):
-        # Implement pagniation
+    def get_paginated_questions():
+        questions = Question.query.all()
+        categories = Category.query.all()
         page = request.args.get("page", 1, type=int)
-        start = (page - 1) * QUESTIONS_PER_PAGE
-        end = start + QUESTIONS_PER_PAGE
+        formatted_categories = format_categories(categories)
 
-        questions = [question.format() for question in selection]
-        current_questions = questions[start:end]
-        return current_questions
+        all_questions = [question.format() for question in questions]
+        current_questions = paginate_questions(request, questions)
+
+        if(len(current_questions) == 0 and page != 1):
+            abort(404)
+
+        return jsonify({
+            "success": True,
+            "total_questions": len(all_questions),
+            "questions": current_questions,
+            "categories": formatted_categories,
+            "current_category": None
+        })
 
 
-# endpoint to DELETE question using a question ID.
+# @TODO:
+#     Create an endpoint to DELETE question using a question ID.
 
-    @app.route("/api/v1/questions/<int:question_id>", methods=["DELETE"])
-    def delete_question(question_id):
+
+    @app.route("/api/v1/questions/<int:id>", methods=["DELETE"])
+    def delete_question(id):
         try:
-            question = Question.query.filter(
-                Question.id == question_id).one_or_none()
+            question = Question.query.get(id)
 
             if question is None:
                 abort(404)
 
             question.delete()
-            selection = Question.query.order_by(Question.id).all()
 
             return jsonify(
                 {
                     "success": True,
-                    "deleted": question_id,
-                    "total_questions": len(Question.query.all()),
+                    "deleted": id,
                 }
             )
 
@@ -94,7 +148,14 @@ def create_app(test_config=None):
             abort(422)
 
 
-# endpoint to POST a new question
+#   @TODO:
+#     Create an endpoint to POST a new question,
+#     which will require the question and answer text,
+#     category, and difficulty score.
+#  @TODO:
+#         Create a POST endpoint to get questions based on a search term.
+#         It should return any questions for whom the search term
+#         is a substring of the question.
 
     @app.route("/api/v1/questions", methods=["POST"])
     def create_question():
@@ -142,8 +203,11 @@ def create_app(test_config=None):
             else:
                 abort(422)
 
-
-# POST endpoint to get questions to play the quiz.
+    # @TODO:
+    #     Create a POST endpoint to get questions to play the quiz.
+    #     This endpoint should take category and previous question parameters
+    #     and return a random questions within the given category,
+    #     if provided, and that is not one of the previous questions.
 
     @app.route("/api/v1/quizzes", methods=["POST"])
     def get_quizzes():
@@ -193,7 +257,10 @@ def create_app(test_config=None):
         # )
 
 
-# Error handlers
+#  @TODO:
+#         Create error handlers for all expected errors
+#         including 404 and 422.
+
 
     @app.errorhandler(404)
     def not_found(error):
