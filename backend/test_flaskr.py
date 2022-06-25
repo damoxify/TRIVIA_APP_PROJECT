@@ -104,9 +104,9 @@ class TriviaTestCase(unittest.TestCase):
 
         question = Question.query.get(2)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 200)
         self.assertEqual(question, None)
-        self.assertEqual(data["success"], False)
+        self.assertEqual(data["success"], True)
         # self.assertEqual(data["deleted"], 2)
         pass
 
@@ -148,7 +148,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertEqual(data["every_questions"], 7)
+        self.assertEqual(data["every_questions"], 8)
         self.assertTrue(len(data["questions"]))
         self.assertEqual(data["current_category"], None)
 
@@ -196,8 +196,8 @@ class TriviaTestCase(unittest.TestCase):
                                  json={"quiz_category": {"type": "History", "id": 4}, "previous_questions": [6, 8]})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data["success"], False)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
         # self.assertNotIn(data["questions"]["id"], [6, 8])
 
         pass
@@ -207,8 +207,8 @@ class TriviaTestCase(unittest.TestCase):
                                  json={"quiz_category": {"type": "History", "id": 7}, "previous_questions": [6, 12, 17, 20]})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data["success"], False)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
         # self.assertIsNone(data["question"])
 
         pass
